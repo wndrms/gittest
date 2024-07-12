@@ -26,9 +26,24 @@ def get_c_function_infos(node, source_code):
                 if name_node:
                     function_name = source_code[name_node.start_byte:name_node.end_byte].decode('utf-8')
                     function_infos[function_name] = (node.start_point[0], node.end_point[0])
-            
-            for child in node.children:
-                walk_tree(child)
+                
+                for child in node.children:
+                    walk_tree(child)
 
-        walk_tree(node)
-        return function_infos
+            walk_tree(node)
+            return function_infos
+def get_java_function_infos(node, source_code):
+    function_infos = {}
+
+    def walk_tree(node):
+        if node.type == 'method_declaration':
+            name_node = node.child_by_field_name('name')
+            if name_node:
+                function_name = source_code[name_node.start_byte:name_node.end_byte].decode('utf-8')
+                function_infos[function_name] = (node.start_point[0], node.end_point[0])
+        
+        for child in node.children:
+            walk_tree(child)
+
+    walk_tree(node)
+    return function_infos
